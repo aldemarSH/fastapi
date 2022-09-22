@@ -18,6 +18,12 @@ def is_category_name(category_name:str):
         return True
     return False
 
+def is_category_id(category_id:int):
+    if not session.get(Category, category_id):
+        return False
+    return True
+
+
 
 # create
 @router.post('/create', status_code= status.HTTP_201_CREATED, response_model= CategoryBase)
@@ -37,3 +43,35 @@ def get_all_categories():
     result = session.exec(statement)
     categories = result.all()
     return categories
+
+# read 
+@router.get('/{category_id}', response_model= CategoryBase)
+def get_a_category(category_id:int):
+    category = session.get(Category, category_id)
+    if not category:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Category not found')
+    return category
+
+#CRUD = create, read, update, delete
+
+# update
+@router.put('/update/{category_id}', response_model= CategoryBase)
+def update_a_category(category_id:int, category:CategoryBase):
+    
+    current_category = session.get(Category, category_id)
+    if not current_category:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Category not found')
+    current_category.name = category.name
+    session.add(current_category)
+    session.commit()
+    session.refresh(current_category)
+    return current_category
+
+@router.delete('/delete/{category_id}')
+def delete_a_category(category_id:int):
+    category = session.get(Category, category_id)
+    if not category:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Category not found')
+    session.delete(category)
+    session.commit()
+    return {'Deleted': category}
