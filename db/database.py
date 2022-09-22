@@ -1,36 +1,20 @@
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlmodel import SQLModel, create_engine, Session
+
+try:
+    from . import models
+except:
+    import models
 
 
+sqlite_file_name = "database2.db"
+sqlite_url = f"sqlite:///{sqlite_file_name}"
 
-# DB_USER: 'postgres'
-# DB_PASSWORD: 123
-# DB_HOST: 'localhost'
-# DB_PORT: 5432
-# DB_NAME: 'ensayo_db'
-# SQLALCHEMY_DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-# SQLALCHEMY_DATABASE_URL = "postgresql://user:password@host:port/db"
-# SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
-
-# engine = create_engine(
-#     SQLALCHEMY_DATABASE_URL}
-# )
-
-SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
-
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
-)
+engine = create_engine(sqlite_url, echo=True)
+session = Session(bind=engine)
 
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+def create_db_and_tables():
+    SQLModel.metadata.create_all(engine)
 
-Base = declarative_base()
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+if __name__ == "__main__":
+    create_db_and_tables()
