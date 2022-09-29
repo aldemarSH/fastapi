@@ -34,7 +34,7 @@ def create_video(video: VideoBase):
     return new_video
 
 # read list all videos
-@router.get('/all', response_model= List[VideoBase])
+@router.get('/all')
 def get_all_videos():
     statement = select(Video).where(Video.is_active).order_by(Video.title)
     result = session.exec(statement)
@@ -80,3 +80,14 @@ def delete_a_video(video_id: int):
     session.commit()
     return {'Deleted': video_id}
 
+# undelete a video
+
+@router.delete('/undelete/{video_id}')
+def undelete_a_video(video_id: int):
+    video = session.get(Video, video_id)
+    if not video:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Not exits')
+    video.is_active = True
+    video.date_last_changed = datetime.utcnow()
+    session.commit()
+    return {'Restored': video_id}

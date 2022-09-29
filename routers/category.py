@@ -1,15 +1,18 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, Depends
 from fastapi.exceptions import HTTPException
 from db.database import session
 from db.models import Category, CategoryBase
 from sqlmodel import select
 from typing import List
+from auth.auth import AuthHandler
 
 
 router = APIRouter(
     prefix='/category',
     tags=['category']
 )
+
+auth_handler = AuthHandler()
 
 def is_category_name(category_name:str):
     if session.exec(
@@ -27,7 +30,7 @@ def is_category_id(category_id:int):
 
 # create
 @router.post('/create', status_code= status.HTTP_201_CREATED, response_model= CategoryBase)
-def create_category(category: CategoryBase):
+def create_category(category: CategoryBase, user = Depends(auth_handler.auth_wrapper)):
     if is_category_name(category_name=category.name):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Category name esta en uso')
     new_category = Category(name= category.name)

@@ -1,3 +1,7 @@
 fastapi
 uvicorn
 sqlmodel
+bcrypt
+passlib
+pyjwt
+pydantic[email]

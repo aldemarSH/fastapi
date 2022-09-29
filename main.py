@@ -1,7 +1,7 @@
 # category, video
 
 from fastapi import FastAPI
-from routers import category, video
+from routers import category, video, user
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -9,6 +9,7 @@ app = FastAPI()
 
 app.include_router(category.router)
 app.include_router(video.router)
+app.include_router(user.router)
 
 app.add_middleware(
     CORSMiddleware,
